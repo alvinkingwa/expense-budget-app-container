@@ -24,6 +24,7 @@ export class CreateCategoriesService {
     private readonly categoryRepository: Repository<CreateCategory>,
   ) {}
 
+  // category for the user
   async createCategoryForUser(
     userId: string,
     name: string,
@@ -38,21 +39,21 @@ export class CreateCategoriesService {
       );
     }
 
-    const categoryId = uuidv4(); // Generate a UUID for the categoryId
+    const categoryId = uuidv4();
 
-    const user = await this.userRepository.findOne({ where: { userId } }); // Fetch the user entity
+    const user = await this.userRepository.findOne({ where: { userId } });
 
     const category = this.categoryRepository.create({
       categoryId,
       name,
       user,
-      userId, // Assign the user entity to the `user` property of the category
+      userId,
       amountSpent: 0,
     });
 
     return this.categoryRepository.save(category);
   }
-
+  // update name for the category
   async updateCategoryForUser(
     userId: string,
     categoryId: string,
@@ -66,11 +67,12 @@ export class CreateCategoriesService {
       throw new NotFoundException('Category not found');
     }
 
-    // Update the name of the category
     category.name = newName;
 
     return this.categoryRepository.save(category);
   }
+
+  // delete category
   async deleteCategoryForUser(
     userId: string,
     categoryId: string,
@@ -86,6 +88,7 @@ export class CreateCategoriesService {
     await this.categoryRepository.remove(category);
   }
 
+  // category spending
   async spendAmountOnCategory(
     userId: string,
     categoryId: string,
@@ -130,7 +133,20 @@ export class CreateCategoriesService {
 
     return category;
   }
+  // transactions made by user
+  async createTransaction(
+    user: User,
+    category: CreateCategory,
+    amount: number,
+  ): Promise<Transaction> {
+    const transaction = new Transaction();
+    transaction.amount = amount;
+    transaction.category = category;
+    transaction.user = user;
+    return this.transactionRepository.save(transaction);
+  }
 
+  // list user's category with no amountSpent
   async getCategoriesWithoutAmountSpent(
     userId: string,
   ): Promise<CreateCategory[]> {
@@ -139,12 +155,13 @@ export class CreateCategoriesService {
     });
   }
 
+  // fetch category list with amountSpent
   async getCategoriesWithSpentAmount(
     userId: string,
   ): Promise<CreateCategory[]> {
     const user = await this.userRepository.findOne({
       where: { userId },
-      relations: ['categories', 'categories.transactions'], // Include the 'categories' and 'transactions' relations
+      relations: ['categories', 'categories.transactions'],
     });
 
     if (!user) {
@@ -156,18 +173,5 @@ export class CreateCategoriesService {
     );
 
     return categoriesWithSpentAmount;
-  }
-  // transactions
-
-  async createTransaction(
-    user: User,
-    category: CreateCategory,
-    amount: number,
-  ): Promise<Transaction> {
-    const transaction = new Transaction();
-    transaction.amount = amount;
-    transaction.category = category;
-    transaction.user = user;
-    return this.transactionRepository.save(transaction);
   }
 }

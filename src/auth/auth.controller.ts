@@ -11,9 +11,5 @@ export class AuthController {
     return this.authService.login(authLoginDto);
   }
 
-  @Delete(':id')
-  async logout(@Param('id') id: string) {
-    await this.authService.deleteUser(id);
-    return { message: 'user deleted successfully' };
-  }
+
 }

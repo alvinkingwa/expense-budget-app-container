@@ -17,9 +17,8 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly tokenService: TokenService,
-    private readonly configService: ConfigService, // Add ConfigService
   ) {}
-
+  // login
   async login(authLoginDto: AuthLoginDto) {
     const user = await this.validateUser(authLoginDto);
     const payload = {
@@ -30,6 +29,7 @@ export class AuthService {
       access_token: accessToken,
     };
   }
+  // jwt secret
   generateAccessToken(payload: { userId: string }): string {
     const options: CustomModuleOptions = {
       secret: process.env.JWT_SECRET,
@@ -45,11 +45,6 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     return user;
-  }
-
-  async deleteUser(userId: string): Promise<void> {
-    const user = await this.usersService.findById(userId);
-    user.remove();
   }
 
   async generateResetToken(user: User, otp: string): Promise<User> {

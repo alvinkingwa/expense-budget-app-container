@@ -16,6 +16,7 @@ import { CreateAmountLimitDto } from './dto/create-amount-limit.dto';
 export class AmountLimitController {
   constructor(private readonly amountLimitService: AmountLimitService) {}
 
+  // set budget limit
   @Post(':categoryId/create')
   async createAmountLimit(
     @Param('categoryId') categoryId: string,
@@ -29,6 +30,7 @@ export class AmountLimitController {
     return amountLimit;
   }
 
+  // update amount Limit
   @Patch(':categoryId/update')
   async updateAmountLimit(
     @Param('categoryId') categoryId: string,
@@ -41,6 +43,7 @@ export class AmountLimitController {
     );
     return updatedAmountLimit;
   }
+  // delete budget
   @Delete(':categoryId/delete')
   async deleteAmountLimit(@Param('categoryId') categoryId: string) {
     await this.amountLimitService.deleteAmountLimit(categoryId);

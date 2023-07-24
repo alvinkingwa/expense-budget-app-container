@@ -16,6 +16,7 @@ import { User } from './user.entity';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  // signup
   @Post('signup')
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
@@ -31,10 +32,5 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
     return user;
-  }
-
-  @Get(':id')
-  show(@Param('id') id: string) {
-    return this.userService.showById(id);
   }
 }

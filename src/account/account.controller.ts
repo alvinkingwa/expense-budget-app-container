@@ -7,13 +7,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AccountService } from './account.service';
-import { UsersService } from 'src/users/users.service';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
+  // deposit
   @Patch('deposit')
   @UseGuards(AuthGuard('jwt'))
   async depositAmount(@Request() req, @Body('amount') amount: number) {

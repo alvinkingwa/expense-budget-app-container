@@ -11,10 +11,13 @@ export class AccountService {
     private readonly accountRepository: Repository<Account>,
   ) {}
 
+  // method for creating account for the user
   async createAccount(user: User): Promise<Account> {
     const account = this.accountRepository.create({ user });
     return this.accountRepository.save(account);
   }
+
+  // user deposit amount
   async depositAmount(userId: string, amount: number): Promise<Account> {
     const account = await this.accountRepository.findOne({
       where: { user: { userId } },

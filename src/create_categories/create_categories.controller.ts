@@ -102,9 +102,10 @@ export class CreateCategoriesController {
     return { message: 'Category deleted successfully' };
   }
 
+  // fetch categories with amount spent
   @Get('categories/transaction')
   @UseGuards(AuthGuard('jwt'))
-  async CategoriesWithoutAmountSpent(@Request() req) {
+  async CategoriesWithAmountSpent(@Request() req) {
     const userId = req.user.userId; // Get the user ID from the request
     const categories =
       await this.createCategoriesService.getCategoriesWithSpentAmount(userId);
