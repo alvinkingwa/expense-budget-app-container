@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import { TokenService } from './token.service';
 import { ConfigService } from '@nestjs/config';
 import { CustomModuleOptions } from './custom-module-options/custom-module-options.interface';
+import * as sendGrid from '@sendgrid/mail';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -17,7 +19,11 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly tokenService: TokenService,
-  ) {}
+    private readonly configService: ConfigService, // Add ConfigService
+  ) {
+    // get sendGrid apikey from env file
+    sendGrid.setApiKey(this.configService.get<string>('SENDGRID_API_KEY'));
+  }
   // login
   async login(authLoginDto: AuthLoginDto) {
     const user = await this.validateUser(authLoginDto);
@@ -42,7 +48,7 @@ export class AuthService {
 
     const user = await this.usersService.findByEmail(email);
     if (!(await user?.validatePassword(password))) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('wrong password');
     }
     return user;
   }
@@ -60,5 +66,13 @@ export class AuthService {
   async updatePassword(user: User, newPassword: string): Promise<User> {
     user.password = await bcrypt.hash(newPassword, 8);
     return this.userRepository.save(user);
+  }
+
+  // SEND EMAIL FOR FORGOTPASSWORD
+  async send(mail: sendGrid.MailDataRequired) {
+    const transport = await sendGrid.send(mail);
+
+    console.log(`Email successfully dispatched to ${mail.to}`);
+    return transport;
   }
 }
