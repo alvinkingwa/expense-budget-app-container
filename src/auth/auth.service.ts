@@ -32,6 +32,7 @@ export class AuthService {
     };
     const accessToken = this.generateAccessToken(payload);
     return {
+      message: 'login successful',
       access_token: accessToken,
     };
   }
