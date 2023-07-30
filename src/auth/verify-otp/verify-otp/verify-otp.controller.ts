@@ -5,6 +5,7 @@ import { UsersService } from 'src/users/users.service';
 export class VerifyOtpController {
   constructor(private readonly userService: UsersService) {}
 
+  // verify otp token
   @Post(':email')
   async verifyOTP(
     @Param('email') email: string,
