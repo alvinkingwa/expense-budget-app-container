@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Account } from 'src/account/account.entity';
+import { CreateUserResponse } from './create-user-response.interface';
 
 @Injectable()
 export class UsersService {
@@ -19,10 +21,15 @@ export class UsersService {
     private readonly accountRepository: Repository<Account>,
   ) {}
   // create user and account
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<CreateUserResponse> {
     try {
       const { firstName, secondName, email, password } = createUserDto;
-
+      const existingUser = await this.userRepository.findOne({
+        where: { email },
+      });
+      if (existingUser) {
+        throw new ConflictException('User with the same email already exists');
+      }
       const user = new User();
       user.userId = uuidv4();
       user.firstName = firstName;
@@ -36,9 +43,14 @@ export class UsersService {
       account.user = createdUser;
       await this.accountRepository.save(account);
 
-      return createdUser;
+      return { user: createdUser, message: 'Signup successful' };
+      // return { message: 'Signup successful' };
+      // return createdUser;
     } catch (error) {
-      throw new BadRequestException('user exists,use different email');
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      throw new BadRequestException('Signup failed');
     }
   }
   async findUserWithAccountAndCategories(userId: string): Promise<any> {
