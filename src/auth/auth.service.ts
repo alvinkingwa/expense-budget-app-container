@@ -29,6 +29,7 @@ export class AuthService {
     const user = await this.validateUser(authLoginDto);
     const payload = {
       userId: user.userId,
+      firstName: user.firstName,
     };
     const accessToken = this.generateAccessToken(payload);
     return {
@@ -37,7 +38,7 @@ export class AuthService {
     };
   }
   // jwt secret
-  generateAccessToken(payload: { userId: string }): string {
+  generateAccessToken(payload: { userId: string; firstName: string }): string {
     const options: CustomModuleOptions = {
       secret: process.env.JWT_SECRET,
     };
