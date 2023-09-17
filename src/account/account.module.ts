@@ -11,6 +11,8 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.entity';
+import { Receiver } from 'src/create_categories/entities/receiver.entity';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -19,6 +21,7 @@ import { User } from 'src/users/user.entity';
       CreateCategory,
       AmountLimit,
       User,
+      Receiver,
     ]),
     // forwardRef(() => UsersModule),
   ],

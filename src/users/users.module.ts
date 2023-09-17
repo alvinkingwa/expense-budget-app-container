@@ -10,6 +10,7 @@ import { CreateCategoriesService } from 'src/create_categories/create_categories
 import { UsersService } from './users.service';
 import { AccountService } from 'src/account/account.service';
 import { AccountModule } from 'src/account/account.module';
+import { Receiver } from 'src/create_categories/entities/receiver.entity';
 // import { UserRepository } from './user.repository';
 import { JwtService } from '@nestjs/jwt';
 
@@ -21,6 +22,7 @@ import { JwtService } from '@nestjs/jwt';
       Account,
       CreateCategory,
       Transaction,
+      Receiver
     ]),
     // forwardRef(() => AccountModule),
   ],

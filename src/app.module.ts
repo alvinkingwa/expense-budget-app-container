@@ -14,6 +14,7 @@ import { AccountModule } from './account/account.module';
 import { Account } from './account/account.entity';
 import { Transaction } from './account/transaction.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { Receiver } from './create_categories/entities/receiver.entity';
 
 const entities = [
   User,
@@ -22,6 +23,7 @@ const entities = [
   Account,
   Transaction,
   User,
+  Receiver,
 ];
 
 @Module({

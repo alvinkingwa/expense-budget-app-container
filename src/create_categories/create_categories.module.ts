@@ -12,6 +12,7 @@ import { UsersService } from 'src/users/users.service';
 import { TokenService } from 'src/auth/token.service';
 import { Account } from 'src/account/account.entity';
 import { Transaction } from 'src/account/transaction.entity';
+import { Receiver } from './entities/receiver.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { Transaction } from 'src/account/transaction.entity';
       User,
       Account,
       Transaction,
+      Receiver,
     ]),
   ],
   controllers: [CreateCategoriesController],

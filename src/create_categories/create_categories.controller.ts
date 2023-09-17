@@ -29,6 +29,7 @@ export class CreateCategoriesController {
     );
     const response = {
       categoryId: category.categoryId,
+      
       name: category.name,
       userId: category.user.userId,
       amountSpent: category.amountSpent,
@@ -43,6 +44,7 @@ export class CreateCategoriesController {
   async spendAmountFromCategory(
     @Request() req,
     @Param('categoryId') categoryId: string,
+    receiverId: number,
     @Body('amount') amount: number,
   ) {
     const userId = req.user.userId; // Get the userId from the request user (set by AuthGuard)
@@ -51,6 +53,7 @@ export class CreateCategoriesController {
         userId,
         categoryId,
         amount,
+        receiverId,
       );
 
     return updatedCategory;

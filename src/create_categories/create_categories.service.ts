@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Account } from 'src/account/account.entity';
 import { User } from 'src/users/user.entity';
 import { Transaction } from 'src/account/transaction.entity';
+import { Receiver } from './entities/receiver.entity';
 
 @Injectable()
 export class CreateCategoriesService {
@@ -22,6 +23,8 @@ export class CreateCategoriesService {
     private readonly accountRepository: Repository<Account>,
     @InjectRepository(CreateCategory)
     private readonly categoryRepository: Repository<CreateCategory>,
+    @InjectRepository(Receiver)
+    private readonly receiverRepository: Repository<Receiver>,
   ) {}
 
   // category for the user
@@ -93,6 +96,7 @@ export class CreateCategoriesService {
     userId: string,
     categoryId: string,
     amount: number,
+    receiverId: number,
   ): Promise<CreateCategory> {
     const account = await this.accountRepository.findOne({
       where: { user: { userId } },
@@ -114,6 +118,7 @@ export class CreateCategoriesService {
       throw new NotFoundException('Category not found');
     }
 
+    // Implement category spending limit check if needed
     // if (category.amountSpent + amount > category.limit.limitAmount) {
     //   throw new BadRequestException('Exceeds category limit');
     // }
@@ -125,14 +130,31 @@ export class CreateCategoriesService {
     const totalAmountSpent = account.amountSpent + amount;
     account.amountSpent = totalAmountSpent;
 
+    // Create a new transaction for spending on the category
+    const categoryTransaction = new Transaction();
+    categoryTransaction.amount = amount;
+    categoryTransaction.user = await this.userRepository.findOne({
+      where: { userId },
+    });
+
+    categoryTransaction.category = category;
+
+    // Set the type to 'category'
+    categoryTransaction.timestamp = new Date();
+    categoryTransaction.type = 'category';
+
+    categoryTransaction.receiver = await this.receiverRepository.findOne({
+      where: { id: receiverId },
+    });
+
+    // Save the category transaction and update account and category
+    await this.transactionRepository.save(categoryTransaction);
     await this.accountRepository.save(account);
     await this.categoryRepository.save(category);
 
-    const user = await this.userRepository.findOne({ where: { userId } });
-    await this.createTransaction(user, category, amount);
-
     return category;
   }
+
   // transactions made by user
   async createTransaction(
     user: User,
@@ -144,6 +166,23 @@ export class CreateCategoriesService {
     transaction.category = category;
     transaction.user = user;
     return this.transactionRepository.save(transaction);
+  }
+
+  async getAllTransactionsForUser(userId: string): Promise<Transaction[]> {
+    const user = await this.userRepository.findOne({
+      where: { userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const transactions = await this.transactionRepository.find({
+      where: { user: { userId } },
+      relations: ['category'], // Load the category relationship
+    });
+
+    return transactions;
   }
 
   // list user's category with no amountSpent

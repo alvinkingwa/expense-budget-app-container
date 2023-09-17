@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Account } from 'src/account/account.entity';
 import { User } from 'src/users/user.entity';
 import { Transaction } from 'src/account/transaction.entity';
+import { Receiver } from 'src/create_categories/entities/receiver.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Transaction } from 'src/account/transaction.entity';
       Account,
       User,
       Transaction,
+      Receiver,
     ]),
   ],
   controllers: [AmountLimitController],

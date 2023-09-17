@@ -9,6 +9,7 @@ import {
 import { Account } from './account.entity';
 import { CreateCategory } from 'src/create_categories/entities/create_category.entity';
 import { User } from 'src/users/user.entity';
+import { Receiver } from 'src/create_categories/entities/receiver.entity';
 
 @Entity()
 export class Transaction {
@@ -28,7 +29,16 @@ export class Transaction {
   @JoinColumn()
   user: User;
 
-  @JoinColumn({ name: 'categoryId' })
-  @ManyToOne(() => CreateCategory, (category) => category.transactions)
-  category: CreateCategory;
+  @ManyToOne(() => CreateCategory, (category) => category.transactions, {
+    nullable: true,
+  })
+  category: CreateCategory; // Allow the category to be nullable
+
+  @ManyToOne(() => Receiver)
+  @JoinColumn()
+  receiver: Receiver;
+
+  // Add a type field to distinguish between deposit and category transactions
+  @Column()
+  type: 'deposit' | 'category';
 }

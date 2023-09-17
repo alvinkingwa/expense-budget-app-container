@@ -22,6 +22,7 @@ import { Transaction } from 'src/account/transaction.entity';
 import { CreateCategoriesService } from 'src/create_categories/create_categories.service';
 import { AccountModule } from 'src/account/account.module';
 import { UsersService } from 'src/users/users.service';
+import { Receiver } from 'src/create_categories/entities/receiver.entity';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { UsersService } from 'src/users/users.service';
       Account,
       CreateCategory,
       Transaction,
+      Receiver,
     ]),
   ],
   controllers: [
