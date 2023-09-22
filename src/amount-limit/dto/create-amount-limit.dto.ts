@@ -1,5 +1,4 @@
 export class CreateAmountLimitDto {
-    categoryId: string;
-    limitAmount: number;
-  }
-  
+  categoryId: string;
+  limitAmount: number;
+}

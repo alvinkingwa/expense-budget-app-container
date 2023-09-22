@@ -2,12 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AmountLimit } from './entities/amount-limit.entity';
+import { CreateCategory } from 'src/create_categories/entities/create_category.entity';
 
 @Injectable()
 export class AmountLimitService {
   constructor(
     @InjectRepository(AmountLimit)
     private readonly amountLimitRepository: Repository<AmountLimit>,
+    @InjectRepository(CreateCategory)
+    private readonly categoryRepository: Repository<CreateCategory>,
   ) {}
 
   // set budget limit for the category
@@ -15,8 +18,14 @@ export class AmountLimitService {
     categoryId: string,
     limitAmount: number,
   ): Promise<AmountLimit> {
+    const category = await this.categoryRepository.findOne({
+      where: { categoryId },
+    });
+    if (!category) {
+      throw new NotFoundException('category not found');
+    }
     const amountLimit = this.amountLimitRepository.create({
-      category: { categoryId },
+      category,
       limitAmount,
     });
 
