@@ -34,8 +34,8 @@ export class Transaction {
   })
   category: CreateCategory; // Allow the category to be nullable
 
-  @ManyToOne(() => Receiver)
-  @JoinColumn()
+  @ManyToOne(() => Receiver, { eager: true })
+  @JoinColumn({ name: 'receiverId' })
   receiver: Receiver;
 
   // Add a type field to distinguish between deposit and category transactions

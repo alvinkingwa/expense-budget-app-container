@@ -22,18 +22,20 @@ export class AccountController {
   // deposit
   @Patch('deposit')
   @UseGuards(AuthGuard('jwt'))
-  async depositAmount(@Request() req, @Body('amount') amount: number) {
-    const userId = req.user.userId; // Get the userId from the request user (set by AuthGuard)
-    const updatedAccount = await this.accountService.depositAmount(
+  async depositAmount(
+    @Request() req,
+    @Body() depositInput: { amount: number; receiverName: string }, // Include receiverName in the request body
+  ) {
+    const userId = req.user.userId;
+    const { amount, receiverName } = depositInput;
+
+    const response = await this.accountService.depositAmount(
       userId,
       amount,
+      receiverName, // Pass receiverName to the service method
     );
 
-    if (!updatedAccount) {
-      throw new NotFoundException('Account not found');
-    }
-
-    return updatedAccount;
+    return response;
   }
 
   @Get('all-transaction/:userId')
@@ -44,10 +46,8 @@ export class AccountController {
         userId,
       );
 
-      // Return the transactions as a response
       return transactions;
     } catch (error) {
-      // Handle any errors or exceptions and return an appropriate response
       throw error;
     }
   }

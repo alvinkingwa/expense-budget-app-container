@@ -11,11 +11,16 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateCategoriesService } from './create_categories.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Receiver } from './entities/receiver.entity';
+import { Repository } from 'typeorm';
 
 @Controller('categories')
 export class CreateCategoriesController {
   constructor(
     private readonly createCategoriesService: CreateCategoriesService,
+    @InjectRepository(Receiver)
+    private readonly receiverRepository: Repository<Receiver>,
   ) {}
 
   // creates user's category
@@ -29,7 +34,7 @@ export class CreateCategoriesController {
     );
     const response = {
       categoryId: category.categoryId,
-      
+
       name: category.name,
       userId: category.user.userId,
       amountSpent: category.amountSpent,
@@ -39,24 +44,42 @@ export class CreateCategoriesController {
   }
 
   // spend on created categories
+  // spend on created categories
   @Patch(':categoryId/spend')
   @UseGuards(AuthGuard('jwt'))
   async spendAmountFromCategory(
     @Request() req,
     @Param('categoryId') categoryId: string,
-    receiverId: number,
-    @Body('amount') amount: number,
+    @Body() spendInput: { amount: number; receiverName: string }, // Change receiverId to receiverName
   ) {
-    const userId = req.user.userId; // Get the userId from the request user (set by AuthGuard)
+    const userId = req.user.userId;
+    const { amount, receiverName } = spendInput;
+
+    // Check if the receiver with the given name exists in the database
+    let receiver = await this.receiverRepository.findOne({
+      where: { name: receiverName },
+    });
+
+    // If the receiver doesn't exist, create a new receiver
+    if (!receiver) {
+      receiver = new Receiver();
+      receiver.name = receiverName;
+      receiver = await this.receiverRepository.save(receiver);
+    }
+
     const updatedCategory =
       await this.createCategoriesService.spendAmountOnCategory(
         userId,
         categoryId,
         amount,
-        receiverId,
+        receiver.id, // Use the receiver's ID
       );
 
-    return updatedCategory;
+    const response = {
+      ...updatedCategory,
+      receiverName: receiver.name,
+    };
+    return response;
   }
 
   //fetch categories with no amount spent on it

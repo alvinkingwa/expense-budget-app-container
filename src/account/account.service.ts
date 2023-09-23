@@ -4,6 +4,8 @@ import { Account } from './account.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/user.entity';
 import { Transaction } from './transaction.entity';
+import { Receiver } from 'src/create_categories/entities/receiver.entity';
+import { DepositResponse } from './depositResponse.interface';
 
 @Injectable()
 export class AccountService {
@@ -14,10 +16,16 @@ export class AccountService {
     private readonly transactionRepository: Repository<Transaction>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Receiver)
+    private readonly receiverRepository: Repository<Receiver>,
   ) {}
 
   // user deposit amount
-  async depositAmount(userId: string, amount: number): Promise<Account> {
+  async depositAmount(
+    userId: string,
+    amount: number,
+    receiverName: string,
+  ): Promise<DepositResponse> {
     const account = await this.accountRepository.findOne({
       where: { user: { userId } },
     });
@@ -34,10 +42,27 @@ export class AccountService {
     depositTransaction.timestamp = new Date();
     depositTransaction.type = 'deposit';
 
+    let receiver = await this.receiverRepository.findOne({
+      where: { name: receiverName },
+    });
+    if (!receiver) {
+      receiver = new Receiver();
+      receiver.name = receiverName;
+      receiver = await this.receiverRepository.save(receiver);
+    }
+
+    depositTransaction.receiver = receiver;
+
     await this.transactionRepository.save(depositTransaction);
 
     account.balance += amount;
+    await this.accountRepository.save(account);
 
-    return this.accountRepository.save(account);
+    const response: DepositResponse = {
+      account,
+      receiverName: receiver.name,
+    };
+
+    return response;
   }
 }

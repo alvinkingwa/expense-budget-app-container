@@ -118,7 +118,6 @@ export class CreateCategoriesService {
       throw new NotFoundException('Category not found');
     }
 
-    // Implement category spending limit check if needed
     // if (category.amountSpent + amount > category.limit.limitAmount) {
     //   throw new BadRequestException('Exceeds category limit');
     // }
@@ -129,6 +128,13 @@ export class CreateCategoriesService {
 
     const totalAmountSpent = account.amountSpent + amount;
     account.amountSpent = totalAmountSpent;
+
+    const receiver = await this.receiverRepository.findOne({
+      where: { id: receiverId },
+    });
+    if (!receiver) {
+      throw new NotFoundException('receiver not found');
+    }
 
     // Create a new transaction for spending on the category
     const categoryTransaction = new Transaction();
@@ -142,10 +148,11 @@ export class CreateCategoriesService {
     // Set the type to 'category'
     categoryTransaction.timestamp = new Date();
     categoryTransaction.type = 'category';
+    categoryTransaction.receiver = receiver;
 
-    categoryTransaction.receiver = await this.receiverRepository.findOne({
-      where: { id: receiverId },
-    });
+    // categoryTransaction.receiver = await this.receiverRepository.findOne({
+    //   where: { id: receiverId },
+    // });
 
     // Save the category transaction and update account and category
     await this.transactionRepository.save(categoryTransaction);
@@ -179,7 +186,7 @@ export class CreateCategoriesService {
 
     const transactions = await this.transactionRepository.find({
       where: { user: { userId } },
-      relations: ['category'], // Load the category relationship
+      relations: ['category', 'receiver'], // Load the category relationship
     });
 
     return transactions;
