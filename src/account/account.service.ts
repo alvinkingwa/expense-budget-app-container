@@ -23,7 +23,7 @@ export class AccountService {
   // user deposit amount
   async depositAmount(
     userId: string,
-    amount: number,
+    amount: number, 
     receiverName: string,
   ): Promise<DepositResponse> {
     const account = await this.accountRepository.findOne({
@@ -60,7 +60,7 @@ export class AccountService {
 
     const response: DepositResponse = {
       account,
-      receiverName: receiver.name,
+      receiverName: receiverName,
     };
 
     return response;

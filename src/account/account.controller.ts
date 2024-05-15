@@ -24,14 +24,15 @@ export class AccountController {
   @UseGuards(AuthGuard('jwt'))
   async depositAmount(
     @Request() req,
-    @Body() depositInput: { amount: number; receiverName: string }, // Include receiverName in the request body
+    @Body() depositInput: { amount: number; recievedFrom:string; receiverName: string }, // Include receiverName in the request body
   ) {
     const userId = req.user.userId;
-    const { amount, receiverName } = depositInput;
+    const { amount, receiverName} = depositInput;
 
     const response = await this.accountService.depositAmount(
       userId,
       amount,
+   
       receiverName, // Pass receiverName to the service method
     );
 

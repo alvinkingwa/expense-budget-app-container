@@ -117,11 +117,6 @@ export class CreateCategoriesService {
     if (!category) {
       throw new NotFoundException('Category not found');
     }
-
-    // if (category.amountSpent + amount > category.limit.limitAmount) {
-    //   throw new BadRequestException('Exceeds category limit');
-    // }
-
     account.balance -= amount;
     category.amountSpent += amount;
     category.timeSpent = new Date();
@@ -150,11 +145,7 @@ export class CreateCategoriesService {
     categoryTransaction.type = 'category';
     categoryTransaction.receiver = receiver;
 
-    // categoryTransaction.receiver = await this.receiverRepository.findOne({
-    //   where: { id: receiverId },
-    // });
 
-    // Save the category transaction and update account and category
     await this.transactionRepository.save(categoryTransaction);
     await this.accountRepository.save(account);
     await this.categoryRepository.save(category);

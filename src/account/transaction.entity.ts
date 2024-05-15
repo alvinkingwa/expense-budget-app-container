@@ -41,4 +41,5 @@ export class Transaction {
   // Add a type field to distinguish between deposit and category transactions
   @Column()
   type: 'deposit' | 'category';
+  receivedFrom: string;
 }
