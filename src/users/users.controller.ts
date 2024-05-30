@@ -6,6 +6,7 @@ import {
   Param,
   NotFoundException,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
@@ -24,13 +25,17 @@ export class UsersController {
 
   @Get(':userId')
   @UseGuards(AuthGuard('jwt'))
-  async getUser(@Param('userId') userId: string): Promise<User> {
-    const user = await this.userService.findUserWithAccountAndCategories(
-      userId,
-    );
+  async getUser(
+    @Param('userId') userId: string,
+    @Query('date') date: string
+  ) {
+    const user = await this.userService.findUserWithAccountAndCategories(userId, date);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     return user;
   }
+
+
+  
 }

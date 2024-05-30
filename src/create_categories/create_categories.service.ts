@@ -145,7 +145,6 @@ export class CreateCategoriesService {
     categoryTransaction.type = 'category';
     categoryTransaction.receiver = receiver;
 
-
     await this.transactionRepository.save(categoryTransaction);
     await this.accountRepository.save(account);
     await this.categoryRepository.save(category);
