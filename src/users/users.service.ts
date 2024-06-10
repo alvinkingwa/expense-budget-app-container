@@ -13,7 +13,7 @@ import { Account } from 'src/account/account.entity';
 import { CreateUserResponse } from './create-user-response.interface';
 // import { startOfMonth, endOfMonth } from 'date-fns';
 import { Transaction } from 'src/account/transaction.entity';
-import { addMinutes, subMinutes, startOfMinute, endOfMinute } from 'date-fns';
+import { addMinutes, subMinutes, startOfMinute, endOfMinute, startOfDay, endOfDay } from 'date-fns';
 import { startOfMonth, endOfMonth, startOfDay as startOfDayDateFn, endOfDay as endOfDayDateFn } from 'date-fns';
 
 
@@ -102,7 +102,7 @@ export class UsersService {
   //   }
   // }
 
-  async findUserWithAccountAndCategories(userId: string, date:string): Promise<any> {
+  async findUserWithAccountAndCategories(userId: string,): Promise<any> {
     const user = await this.userRepository.findOne({
       where: { userId },
       relations: ['account', 'categories', 'categories.limit'],
@@ -144,19 +144,19 @@ export class UsersService {
 
     const savings = monthlyDepositTotal - monthlyExpenseTotal;
 
-    const targetDate = new Date(date);
-    const startOfDayDate = startOfDayDateFn(targetDate);
-    const endOfDayDate = endOfDayDateFn(targetDate);
+    // const targetDate = new Date(date);
+    // const startOfDayDate = startOfDayDateFn(targetDate);
+    // const endOfDayDate = endOfDayDateFn(targetDate);
 
-    const dailyExpenseTransactions = await this.transactionRepository.find({
-      where: {
-        user: { userId },
-        type:'category',
-        timestamp: Between(startOfDayDate, endOfDayDate) as unknown as Date,
-      },
-    });
+    // const dailyExpenseTransactions = await this.transactionRepository.find({
+    //   where: {
+    //     user: { userId },
+    //     type:'category',
+    //     timestamp: Between(startOfDayDate, endOfDayDate) as unknown as Date,
+    //   },
+    // });
 
-    const dailyExpenseTotal = dailyExpenseTransactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+    // const dailyExpenseTotal = dailyExpenseTransactions.reduce((acc, transaction) => acc + transaction.amount, 0);
 
     // Exclude specific fields from the user object
     const {
@@ -175,9 +175,27 @@ export class UsersService {
       monthlyDepositTotal,
       monthlyExpenseTotal,
       savings,
-      dailyExpenseTotal
+      // dailyExpenseTotal
     };
   }
+
+
+  async getDailyExpenseTotal(userId: string, date: string): Promise<number> {
+    const startOfDayDate = startOfDay(new Date(date));
+    const endOfDayDate = endOfDay(new Date(date));
+  
+    const transactions = await this.transactionRepository.find({
+      where: {
+        user: { userId },
+        type: 'category', // Assuming 'category' means expense
+        timestamp: Between(startOfDayDate, endOfDayDate),
+      },
+    });
+  
+    const dailyExpenseTotal = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+    return dailyExpenseTotal;
+  }
+
 
   async findById(userId: string): Promise<User> {
     return await this.userRepository.findOne({ where: { userId } });

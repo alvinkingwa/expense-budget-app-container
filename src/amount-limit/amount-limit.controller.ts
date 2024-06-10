@@ -6,6 +6,7 @@ import {
   UseGuards,
   Patch,
   Delete,
+  Get,
 } from '@nestjs/common';
 import { AmountLimitService } from './amount-limit.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -43,10 +44,19 @@ export class AmountLimitController {
     );
     return updatedAmountLimit;
   }
+
   // delete budget
   @Delete(':categoryId/delete')
   async deleteAmountLimit(@Param('categoryId') categoryId: string) {
     await this.amountLimitService.deleteAmountLimit(categoryId);
     return { message: 'Amount limit deleted successfully' };
   }
+
+  // get total amount limit monthly
+  @Get(':userId/total/monthly')
+  async getTotalAmountLimitMonthly(@Param('userId') userId: string) {
+    const totalAmountLimitMonthly = await this.amountLimitService.getTotalAmountLimitMonthly(userId);
+    return { totalAmountLimitMonthly, userId };
+  }
+  
 }

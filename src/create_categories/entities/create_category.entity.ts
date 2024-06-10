@@ -39,4 +39,6 @@ export class CreateCategory {
 
   @OneToMany(() => Transaction, (transaction) => transaction.category)
   transactions: Transaction[];
+  amountLimit: any;
+
 }

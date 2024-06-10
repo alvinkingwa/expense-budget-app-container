@@ -27,9 +27,9 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   async getUser(
     @Param('userId') userId: string,
-    @Query('date') date: string
+   
   ) {
-    const user = await this.userService.findUserWithAccountAndCategories(userId, date);
+    const user = await this.userService.findUserWithAccountAndCategories(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -37,5 +37,14 @@ export class UsersController {
   }
 
 
-  
+  @Get(':userId/daily-expense-total')
+@UseGuards(AuthGuard('jwt'))
+async getDailyExpenseTotal(
+  @Param('userId') userId: string,
+  @Query('date') date: string
+) {
+  const dailyExpenseTotal = await this.userService.getDailyExpenseTotal(userId, date);
+  return { dailyExpenseTotal };
+}
+
 }
