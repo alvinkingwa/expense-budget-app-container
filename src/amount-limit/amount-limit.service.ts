@@ -85,18 +85,6 @@ export class AmountLimitService {
     }
   }
 
-  // async getTotalAmountLimitMonthly(userId: string): Promise<number> {
-  //   const result = await this.entityManager
-  //     .createQueryBuilder(AmountLimit, 'amountLimit')
-  //     .select('SUM(amountLimit.limitAmount)', 'total')
-  //     .innerJoin('amountLimit.category', 'category')
-  //     .where('category.userId = :userId', { userId })
-  //     .getRawOne();
-    
-  //   return result ? parseFloat(result.total) : 0;
-  // }
-
- 
   async getTotalAmountLimitMonthly(userId: string): Promise<number> {
     const currentDate = new Date();
     const startOfMonthDate = startOfMonth(currentDate);
