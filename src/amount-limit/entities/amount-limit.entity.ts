@@ -21,8 +21,8 @@ export class AmountLimit {
   @JoinColumn({ name: 'categoryId' })
   category: CreateCategory;
 
-  @Column()
-  userId:string
+  // @Column()
+  // userId:string
 
   @CreateDateColumn() // This will add a createdAt column to your entity
   createdAt: Date;
